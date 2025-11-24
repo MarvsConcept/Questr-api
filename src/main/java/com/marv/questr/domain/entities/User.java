@@ -31,7 +31,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "author", orphanRemoval = true)
+    @OneToMany(mappedBy = "author")
     private List<Question> questions = new ArrayList<>();
 
     @Override
