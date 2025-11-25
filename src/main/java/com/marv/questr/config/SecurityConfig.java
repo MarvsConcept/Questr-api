@@ -22,6 +22,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
@@ -30,7 +31,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/v1/questions/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/questions/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/questions/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/questions/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

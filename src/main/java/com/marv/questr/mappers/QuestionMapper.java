@@ -1,6 +1,8 @@
 package com.marv.questr.mappers;
 
 
+import com.marv.questr.domain.dtos.CreateQuestionRequestDto;
+import com.marv.questr.domain.dtos.QuestionDetailDto;
 import com.marv.questr.domain.dtos.QuestionSummaryDto;
 import com.marv.questr.domain.entities.Question;
 import com.marv.questr.domain.entities.Tag;
@@ -45,4 +47,18 @@ public interface QuestionMapper {
             dto.setExcerpt(content);
         }
     }
+
+    @Mapping(target = "authorUsername", source = "author.username")
+    @Mapping(target = "tags", expression = "java(mapTags(question.getTags()))")
+    QuestionDetailDto toDetailDto(Question question);
+
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "author", ignore = true) // will be set in service
+    @Mapping(target = "tags", ignore = true)   // will be set in service
+    Question toEntity(CreateQuestionRequestDto dto);
+
 }

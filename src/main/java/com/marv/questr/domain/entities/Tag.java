@@ -18,6 +18,10 @@ import java.util.UUID;
 @Builder
 public class Tag {
 
+    public Tag(String name) {
+        this.name = name;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
