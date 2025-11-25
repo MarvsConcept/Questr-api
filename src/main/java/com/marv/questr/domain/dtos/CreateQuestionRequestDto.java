@@ -25,8 +25,5 @@ public class CreateQuestionRequestDto {
     @NotBlank(message = "Content is required")
     private String content;
 
-    @NotNull(message = "Author id is required")
-    private UUID authorId;
-
     private Set<String> tags;
 }

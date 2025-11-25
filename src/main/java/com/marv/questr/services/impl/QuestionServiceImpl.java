@@ -14,6 +14,7 @@ import com.marv.questr.mappers.QuestionMapper;
 import com.marv.questr.services.QuestionService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,9 +53,16 @@ public class QuestionServiceImpl implements QuestionService {
 
         Question question = questionMapper.toEntity(dto);
 
-        User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        question.setAuthor(author);
+        //Get current logged in User
+        User currentUser = (User) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        question.setAuthor(currentUser);
+
+//        User author = userRepository.findById(dto.getAuthorId())
+//                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+//        question.setAuthor(author);
 
         questionRepository.save(question);
 
