@@ -50,6 +50,7 @@ public interface QuestionMapper {
 
     @Mapping(target = "authorUsername", source = "author.username")
     @Mapping(target = "tags", expression = "java(mapTags(question.getTags()))")
+    @Mapping(target = "answers", ignore = true)
     QuestionDetailDto toDetailDto(Question question);
 
 
