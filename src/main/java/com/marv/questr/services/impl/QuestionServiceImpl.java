@@ -1,5 +1,6 @@
 package com.marv.questr.services.impl;
 
+import com.marv.questr.domain.Role;
 import com.marv.questr.domain.dtos.CreateQuestionRequestDto;
 import com.marv.questr.domain.dtos.QuestionDetailDto;
 import com.marv.questr.domain.dtos.QuestionSummaryDto;
@@ -33,6 +34,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
 
+
     @Override
     public List<QuestionSummaryDto> getAllQuestions() {
         var questions = questionRepository.findAll();
@@ -54,9 +56,7 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = questionMapper.toEntity(dto);
 
         //Get current logged in User
-        User currentUser = (User) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
+        User currentUser = getCurrentUser();
 
         question.setAuthor(currentUser);
 
@@ -85,6 +85,17 @@ public class QuestionServiceImpl implements QuestionService {
         Question existingQuestion = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Question does not exist with id: " + id));
 
+        //Get current User
+        User currentUser = getCurrentUser();
+
+
+        boolean isOwner = existingQuestion.getAuthor().getId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new IllegalStateException("You are not allowed to update this question");
+        }
+
         existingQuestion.setTitle(dto.getTitle());
         existingQuestion.setContent(dto.getContent());
 
@@ -108,7 +119,26 @@ public class QuestionServiceImpl implements QuestionService {
     public void deleteQuestion(UUID id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Question does not exist with id: " + id));
+
+        //Get current User
+        User currentUser = getCurrentUser();
+
+        boolean isOwner = question.getAuthor().getId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new IllegalStateException("You are not allowed to delete this question");
+        }
+
         questionRepository.delete(question);
+    }
+
+
+
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
     }
 }
 

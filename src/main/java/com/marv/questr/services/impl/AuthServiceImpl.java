@@ -1,5 +1,7 @@
 package com.marv.questr.services.impl;
 
+import com.marv.questr.domain.Role;
+import com.marv.questr.domain.dtos.AdminRegisterRequestDto;
 import com.marv.questr.domain.dtos.LoginRequestDto;
 import com.marv.questr.domain.dtos.LoginResponseDto;
 import com.marv.questr.domain.dtos.RegisterRequestDto;
@@ -8,10 +10,13 @@ import com.marv.questr.domain.repositories.UserRepository;
 import com.marv.questr.security.JwtService;
 import com.marv.questr.services.AuthService;
 import lombok.RequiredArgsConstructor;
+
 import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +26,15 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @Value("${admin.registration.key}")
+    private String adminRegistrationKey;
+
     @Override
     public void register(RegisterRequestDto dto) {
 
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email is already in use");
         }
-
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username is already in use");
         }
@@ -38,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .password(hashedPassword)
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);
@@ -59,6 +67,33 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponseDto.builder()
                 .token(token)
                 .build();
+    }
+
+    @Override
+    public void registerAdmin(AdminRegisterRequestDto dto) {
+
+        if (!dto.getSecretKey().equals(adminRegistrationKey)) {
+            throw new IllegalArgumentException("Invalid admin registration key");
+        }
+
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username is already in use");
+        }
+
+        String hashedPassword = passwordEncoder.encode(dto.getPassword());
+
+        User user = User.builder()
+                .username(dto.getUsername())
+                .email(dto.getEmail())
+                .password(hashedPassword)
+                .role(Role.ADMIN)
+                .build();
+
+        userRepository.save(user);
 
     }
 }

@@ -1,5 +1,6 @@
 package com.marv.questr.domain.entities;
 
+import com.marv.questr.domain.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,10 @@ public class User {
 
     @OneToMany(mappedBy = "author")
     private List<Question> questions = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Override
     public boolean equals(Object o) {

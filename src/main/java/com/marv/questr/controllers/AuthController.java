@@ -1,5 +1,6 @@
 package com.marv.questr.controllers;
 
+import com.marv.questr.domain.dtos.AdminRegisterRequestDto;
 import com.marv.questr.domain.dtos.LoginRequestDto;
 import com.marv.questr.domain.dtos.LoginResponseDto;
 import com.marv.questr.domain.dtos.RegisterRequestDto;
@@ -28,5 +29,11 @@ public class AuthController {
     public LoginResponseDto login(
             @Valid @RequestBody LoginRequestDto dto) {
         return authService.login(dto);
+    }
+
+    @PostMapping("/register-admin")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registerAdmin(@Valid @RequestBody AdminRegisterRequestDto dto) {
+        authService.registerAdmin(dto);
     }
 }

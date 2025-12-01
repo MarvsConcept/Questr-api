@@ -6,19 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class QuestionDetailDto {
+public class AnswerResponseDto {
 
     private UUID id;
-
-    private String title;
 
     private String content;
 
@@ -26,12 +22,6 @@ public class QuestionDetailDto {
 
     private LocalDateTime updatedAt;
 
-    private Integer views;
-
     private String authorUsername;
-
-    private Set<String> tags;
-
-    private List<AnswerResponseDto> answers;
 
 }
